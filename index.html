@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPL–DUSI Diagnostic Engine v4.11 | Somatic Masquerade Suite</title>
+<style>
+:root {
+  --bg: #0a0f1a;
+  --surface: #111827;
+  --card: #1a2332;
+  --border: #2a3a4e;
+  --text: #e2e8f0;
+  --muted: #b6c2d1;
+  --accent: #38bdf8;
+  --accent2: #a78bfa;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --ok: #22c55e;
+  --info: #60a5fa;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  padding-bottom: 56px;
+}
+
+.header-inner {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+}
+h1 { font-size: 1.4rem; font-weight: 700; }
+h1 span { color: var(--accent); }
+.subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+.header-actions { display: flex; gap: 8px; }
+button {
+  padding: 10px 18px; border: none; border-radius: 8px;
+  font-weight: 600; cursor: pointer; font-size: 0.9rem;
+  transition: all 0.2s;
+}
+button:hover { transform: translateY(-1px); filter: brightness(1.1); }
+.btn-primary { background: var(--accent); color: #0a0f1a; }
+.btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+.btn-danger { background: var(--danger); color: white; }
+nav {
+  max-width: 1400px; margin: 0 auto; padding: 16px 24px 0;
+  display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+}
+.tab-btn {
+  padding: 10px 16px; border-radius: 8px 8px 0 0;
+  background: var(--card); color: var(--muted);
+  border: 1px solid var(--border); border-bottom: none;
+  cursor: pointer; font-weight: 500; font-size: 0.88rem;
+}
+.tab-btn.active { background: var(--surface); color: var(--accent); border-color: var(--accent); }
+main { max-width: 1400px; margin: 0 auto; padding: 0 24px 16px; }
+.panel { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 0 12px 12px 12px; padding: 24px; }
+.panel.active { display: block; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px;
+}
+.card h3 { font-size: 1rem; margin-bottom: 12px; color: var(--accent); }
+.card h4 { font-size: 0.9rem; margin: 12px 0 8px; color: var(--accent2); }
+label { display: block; margin: 8px 0; font-size: 0.9rem; cursor: pointer; }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); margin-right: 8px; }
+input[type="number"], input[type="text"], select, textarea {
+  width: 100%; padding: 10px 12px; margin-top: 4px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 0.9rem;
+}
+textarea { min-height: 80px; resize: vertical; }
+.banner {
+  padding: 14px 18px; border-radius: 10px; margin: 12px 0;
+  font-size: 0.9rem; font-weight: 500;
+}
+.banner-danger { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+.banner-warn { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); color: #fcd34d; }
+.banner-info { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.3); color: #93c5fd; }
+.banner-ok { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 600; margin: 2px 4px 2px 0;
+}
+.badge-danger { background: rgba(239,68,68,0.2); color: #fca5a5; }
+.badge-warn { background: rgba(245,158,11,0.2); color: #fcd34d; }
+.badge-ok { background: rgba(34,197,94,0.2); color: #86efac; }
+.badge-info { background: rgba(96,165,250,0.2); color: #93c5fd; }
+.risk-track { width: 100%; height: 20px; background: var(--bg); border-radius: 10px; overflow: hidden; margin: 12px 0; border: 1px solid var(--border); }
+.risk-fill { height: 100%; width: 0%; transition: width 0.5s; border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--bg); color: var(--accent); font-weight: 600; }
+tr:hover { background: rgba(56,189,248,0.05); }
+.pathway-box { border-left: 4px solid var(--accent); padding: 12px 16px; margin: 10px 0; background: rgba(56,189,248,0.05); border-radius: 0 8px 8px 0; }
+.pathway-box.p1 { border-color: #f97316; }
+.pathway-box.p2 { border-color: #ef4444; }
+.pathway-box.p3 { border-color: #f59e0b; }
+.pathway-box.p4 { border-color: #a78bfa; }
+.pathway-box.p5 { border-color: #22c55e; }
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.metric-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+.metric-value { font-size: 1.6rem; font-weight: 700; color: var(--accent); }
+.metric-label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+.report-box {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 20px; font-family: 'Courier New', monospace;
+  font-size: 0.82rem; white-space: pre-wrap; max-height: 500px; overflow-y: auto;
+  color: #a5f3fc;
+}
+.toggle-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.toggle-group label { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; }
+.footer-note { text-align: center; color: var(--muted); font-size: 0.8rem; padding: 20px; border-top: 1px solid var(--border); margin-top: 40px; }
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+  .header-inner { flex-direction: column; }
+  nav { overflow-x: auto; }
+}
+
+/* ---- header ---- */
+.hdr { background: linear-gradient(120deg, #0b1020 0%, #1e1b4b 48%, #134e4a 100%); border-bottom: 2px solid #38bdf8; padding: 26px 24px 22px; position: sticky; top: 0; z-index: 100; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+.hdr-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+.hdr-kicker { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: #5eead4; font-weight: 600; margin-bottom: 6px; }
+.hdr h1 { font-size: 1.9rem; line-height: 1.15; color: #f8fafc; }
+.hdr h1 span { background: linear-gradient(90deg, #38bdf8, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hdr h1 small { font-size: .5em; font-weight: 600; color: #fbbf24; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.4); border-radius: 999px; padding: 3px 10px; vertical-align: middle; margin-left: 6px; }
+.hdr-sub { color: #cbd5e1; font-size: .92rem; max-width: 720px; margin-top: 8px; }
+.hdr-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.hdr-badges span { font-size: .73rem; font-weight: 600; padding: 5px 11px; border-radius: 999px; background: rgba(56,189,248,.12); border: 1px solid rgba(56,189,248,.35); color: #bae6fd; }
+.hdr-badges span:nth-child(2) { background: rgba(167,139,250,.14); border-color: rgba(167,139,250,.4); color: #ddd6fe; }
+.hdr-badges span:nth-child(3) { background: rgba(52,211,153,.12); border-color: rgba(52,211,153,.4); color: #a7f3d0; }
+.hdr-badges span:nth-child(4) { background: rgba(248,113,113,.12); border-color: rgba(248,113,113,.4); color: #fecaca; }
+.hdr .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 768px) { .hdr h1 { font-size: 1.5rem; } }
+
+/* ---- compact footer and About panel ---- */
+.ftr-min { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; background: #0b1020; border-top: 1px solid var(--border); padding: 8px 16px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; font-size: .78rem; color: var(--muted); }
+.ftr-min a { color: var(--accent); }
+.ftr-min { box-sizing: border-box; width: 100%; text-align: center; }
+.ftr-min span { max-width: 100%; overflow-wrap: anywhere; }
+.about-toggle { background: var(--card); color: var(--accent); border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; font-size: .78rem; font-weight: 600; cursor: pointer; }
+.about-panel { max-width: 1100px; margin: 24px auto 0; padding: 18px 20px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; font-size: .86rem; line-height: 1.6; }
+.about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+.about-panel h4 { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: #5eead4; margin-bottom: 6px; }
+.about-panel p { margin-bottom: 6px; }
+.about-panel a { color: var(--accent); }
+.about-small { font-size: .78rem; color: var(--muted); }
+
+.rs-bar { position: sticky; top: calc(var(--hdr-h, 120px) + 8px); z-index: 50; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; box-shadow: 0 6px 16px rgba(0,0,0,.3); }
+.rs-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.rs-jump { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.rs-jump a { font-size: .8rem; color: var(--accent); text-decoration: none; padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px; }
+#tab-results { scroll-margin-top: 150px; }
+.rep-sec { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin-bottom: 14px; scroll-margin-top: 150px; }
+.rep-sec h2 { font-size: 1rem; color: #5eead4; margin-bottom: 8px; }
+.rep-sec ul { padding-left: 20px; }
+.rep-sec li { margin: 6px 0; line-height: 1.6; }
+.rep-sec .score { font-size: 1.8rem; font-weight: 700; color: #f8fafc; }
+.rep-foot { font-size: .8rem; color: var(--muted); margin-top: 16px; }
+@media print {
+  body.print-report header, body.print-report nav, body.print-report .ftr-min, body.print-report .about-panel,
+  body.print-report .rs-actions, body.print-report .rs-jump, body.print-report .panel:not(#tab-results) { display: none !important; }
+  body.print-report .rs-bar { position: static; box-shadow: none; }
+  body.print-report .rep-sec { box-shadow: none; background: #fff; color: #000; break-inside: avoid; }
+  body.print-report { background: #fff; color: #000; }
+}
+</style>
+</head>
+<body>
+
+<header class="hdr" id="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-brand">
+      <div class="hdr-kicker">Noire E. PPL-DUSI Framework. Preprint, 2026.</div>
+      <h1><span>PPL–DUSI</span> Diagnostic Engine <small>v4.11</small></h1>
+      <div class="hdr-badges">
+        <span>12 upgrades</span><span>Evidence levels A · B · C</span><span>Runs in your browser, no data sent</span><span>Not for clinical decisions</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-primary" onclick="runAnalysis()">▶ Run Analysis</button>
+      <button class="btn-secondary" onclick="clearAll()">✕ Clear</button>
+      <button class="btn-secondary" onclick="exportReport()">⬇ Export Report</button>
+    </div>
+  </div>
+</header>
+<nav>
+  <button class="tab-btn active" data-tab="patient" onclick="showTab('patient', this)">01 · Patient Context<span class="dot" id="dot-patient"></span></button>
+  <button class="tab-btn" data-tab="symptoms" onclick="showTab('symptoms', this)">02 · Symptoms & Onset<span class="dot" id="dot-symptoms"></span></button>
+  <button class="tab-btn" data-tab="medications" onclick="showTab('medications', this)">03 · Medication / Exposure Map</button>
+  <button class="tab-btn" data-tab="labs" onclick="showTab('labs', this)">04 · FESS Labs</button>
+  <button class="tab-btn" data-tab="pause" onclick="showTab('pause', this)">05 · Diagnostic Pause</button>
+  <button class="tab-btn" data-tab="results" onclick="showTab('results', this)">06 · Results & Report</button>
+</nav>
+
+<main>
+
+<!-- ==================== TAB 1: PATIENT CONTEXT ==================== -->
+<section id="tab-patient" class="panel active">
+  <div class="grid">
+    <div class="card">
+      <h3>Demographics</h3>
+      <label>Age
+        <input type="number" id="age" min="18" max="120" placeholder="e.g. 34">
+      </label>
+      <label>Sex / Physiological Context
+        <select id="sex">
+          <option value="">Select</option>
+          <option value="female">Female</option>
+          <option value="male">Male</option>
+          <option value="intersex">Intersex / Other</option>
+          <option value="unknown">Prefer not to say</option>
+        </select>
+      </label>
+      <label>Pregnancy / Postpartum Context
+        <select id="pregnancy">
+          <option value="na">Not applicable</option>
+          <option value="pregnant">Pregnant</option>
+          <option value="postpartum">Postpartum ≤12 months</option>
+          <option value="trying">Trying to conceive</option>
+        </select>
+      </label>
+      <label>Clinical Setting
+        <select id="setting">
+          <option>Emergency Department</option>
+          <option>Primary Care</option>
+          <option>Outpatient Psychiatry</option>
+          <option>Inpatient Psychiatry</option>
+          <option>Medical Ward</option>
+          <option>ICU / Acute Medical</option>
+          <option>Community / Telehealth</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="card">
+      <h3>Diagnostic Risk Context</h3>
+      <label><input type="checkbox" id="firstEpisode" checked> First-episode psychiatric presentation</label>
+      <label><input type="checkbox" id="existingDx"> Existing psychiatric diagnosis (overshadowing risk)</label>
+      <label><input type="checkbox" id="psychMeds"> Psychotropic medication already started</label>
+      <label><input type="checkbox" id="thiamineGiven"> Parenteral thiamine given before glucose</label>
+
+      <h4>Alcohol / Withdrawal Context</h4>
+      <select id="alcohol">
+        <option value="none">No / Unknown</option>
+        <option value="hazardous">Hazardous use</option>
+        <option value="aud">Alcohol Use Disorder</option>
+        <option value="withdrawal">Recent withdrawal</option>
+        <option value="intoxicated">Suspected intoxication</option>
+      </select>
+
+      <div id="wernickeAlert" style="display:none" class="banner banner-danger">
+        ⚠️ <strong>WERNICKE-KORSACOFF SCREENING TRIGGERED</strong><br>
+        • Parenteral thiamine BEFORE glucose, mandatory<br>
+        • Classic triad present in &lt;10%; do NOT wait for triad<br>
+        • Give parenteral thiamine as the first treatment step; dosing per local protocol<br>
+        • Requires magnesium for utilisation<br>
+        • Psychiatric label (psychosis, personality disorder, alcohol-induced dementia) becomes self-fulfilling if thiamine deficiency untreated
+      </div>
+
+      <h4>Resource Setting</h4>
+      <div class="toggle-group">
+        <label><input type="radio" name="resourceMode" value="full" checked> Full FESS Available</label>
+        <label><input type="radio" name="resourceMode" value="limited"> Resource-Limited Setting</label>
+      </div>
+      <div id="lowResourceNote" style="display:none" class="banner banner-info">
+        ℹ️ <strong>LOW-RESOURCE PANEL ACTIVE</strong><br>
+        Minimum screening: FBC, Ferritin, TSH, Fasting Glucose, Basic Metabolic Panel, Structured Medication/Substance History.<br>
+        This reduced panel is preferable to no screening. Refer for full FESS when available.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Population-specific considerations</h3>
+      <div id="genderAlert" style="display:none" class="banner banner-warn">
+        ⚠️ <strong>FACTORS THAT MAY RAISE RISK IN WOMEN AGED 18–50</strong><br>
+        These are not measured in this assessment.<br>
+        • Menstruation can deplete iron. Check ferritin when heavy bleeding is reported<br>
+        • Hormonal contraception is associated with depression. The mechanism is not established<br>
+        • Credibility discounting in clinical encounters may delay recognition of somatic illness<br>
+        • Peddie et al. (2023) found zinc deficiency in 21% of non-vegetarian and 50% of vegetarian adolescent women in New Zealand
+      </div>
+      <div id="olderAdultAlert" style="display:none" class="banner banner-warn">
+        ⚠️ <strong>OLDER ADULT FOCUS ACTIVE (≥65)</strong><br>
+        • Avoid anticholinergics (Beers Criteria)<br>
+        • Avoid benzodiazepines (increased falls, confusion)<br>
+        • Reduced renal clearance → drug accumulation<br>
+        • Altered BBB permeability → increased CNS effects<br>
+        • Reduced cholinergic reserve → anticholinergic sensitivity<br>
+        • Polypharmacy → exponential interaction risk
+      </div>
+      <label><input type="checkbox" id="olderAdultFocus"> Older-adult focus active (age ≥65 auto-detect)</label>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== TAB 2: SYMPTOMS & ONSET ==================== -->
+<section id="tab-symptoms" class="panel">
+  <div class="grid">
+    <div class="card">
+      <h3>Onset Window</h3>
+      <div class="toggle-group">
+        <label><input type="radio" name="onset" value="acute" checked> Acute (&lt;72h)</label>
+        <label><input type="radio" name="onset" value="subacute"> Subacute (1–4 weeks)</label>
+        <label><input type="radio" name="onset" value="chronic"> Chronic (months+)</label>
+        <label><input type="radio" name="onset" value="unknown"> Unknown</label>
+      </div>
+
+      <h3>Symptom Profile</h3>
+      <label><input type="checkbox" class="symptom" value="depression"> Depression / Low mood</label>
+      <label><input type="checkbox" class="symptom" value="anxiety"> Anxiety / Panic</label>
+      <label><input type="checkbox" class="symptom" value="psychosis"> Psychosis / Paranoia</label>
+      <label><input type="checkbox" class="symptom" value="hallucinations"> Hallucinations</label>
+      <label><input type="checkbox" class="symptom" value="mania"> Mania / Agitation</label>
+      <label><input type="checkbox" class="symptom" value="insomnia"> Insomnia</label>
+      <label><input type="checkbox" class="symptom" value="cognitive"> Cognitive fog / Confusion</label>
+      <label><input type="checkbox" class="symptom" value="delirium"> Delirium / Fluctuating awareness</label>
+      <label><input type="checkbox" class="symptom" value="suicidal"> Suicidal ideation</label>
+      <label><input type="checkbox" class="symptom" value="akathisia"> Akathisia / Inner restlessness</label>
+      <label><input type="checkbox" class="symptom" value="dissociation"> Dissociation / Depersonalisation</label>
+      <label><input type="checkbox" class="symptom" value="fatigue"> Fatigue / Anhedonia</label>
+    </div>
+
+    <div class="card">
+      <h3>Medical Red Flags</h3>
+      <label><input type="checkbox" class="redflag" value="fever"> Fever / Infection signs</label>
+      <label><input type="checkbox" class="redflag" value="seizure"> Seizure</label>
+      <label><input type="checkbox" class="redflag" value="autonomic"> Autonomic instability</label>
+      <label><input type="checkbox" class="redflag" value="focal"> Focal neurological signs</label>
+      <label><input type="checkbox" class="redflag" value="headache"> New severe headache</label>
+      <label><input type="checkbox" class="redflag" value="vitals"> Abnormal vitals</label>
+      <label><input type="checkbox" class="redflag" value="movement"> Movement disorder / Tremor / Rigidity</label>
+      <label><input type="checkbox" class="redflag" value="fluctuating"> Rapidly fluctuating course</label>
+
+      <h4>Autoimmune Encephalitis Red Flags (UPGRADE #7)</h4>
+      <div class="banner banner-danger">
+        🧠 <strong>AE SCREENING: 25% initially misdiagnosed as psychiatric (Flanagan, 2023)</strong>
+      </div>
+      <label><input type="checkbox" class="aeFlag" value="fluctuating_consciousness"> Fluctuating consciousness + Treatment resistance</label>
+      <label><input type="checkbox" class="aeFlag" value="orofacial"> Orofacial dyskinesias (subtle mouthing movements)</label>
+      <label><input type="checkbox" class="aeFlag" value="new_onset_45"> New-onset psychosis in patient &lt;45 with no prior history</label>
+      <label><input type="checkbox" class="aeFlag" value="autonomic_ae"> Autonomic instability + Psychiatric symptoms</label>
+      <label><input type="checkbox" class="aeFlag" value="movement_ae"> Movement disorder + Behavioural change</label>
+      <div id="aeAlert" style="display:none" class="banner banner-danger">
+        ⚠️ <strong>AUTOIMMUNE ENCEPHALITIS WORKUP TRIGGERED</strong><br>
+        Order: Autoantibody panel (anti-NMDA, anti-LGI1, anti-CASPR2, anti-GAD65), CSF analysis, EEG, Brain MRI.<br>
+        Do NOT close as primary psychiatric illness without AE exclusion.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== TAB 3: MEDICATION / EXPOSURE MAP ==================== -->
+<section id="tab-medications" class="panel">
+  <div class="banner banner-info">
+    📋 <strong>TEMPORAL RULE:</strong> Map the 72 hours to 6 months before onset. Confirm timing, dose changes, missed doses, discontinuation, and collateral history. Acute reactions require tight timing; depletion syndromes may require months of exposure.
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Acute High-Risk Exposures (Last 72 Hours)</h3>
+      <label><input type="checkbox" class="med" data-name="Tramadol" data-window="acute" data-weight="18" data-misdx="Major Depressive Episode, Adjustment Disorder" data-onset="12–72h"> Tramadol</label>
+      <label><input type="checkbox" class="med" data-name="Corticosteroids" data-window="acute" data-weight="17" data-misdx="Bipolar I, Brief Psychotic Disorder" data-onset="Days 1–7"> Corticosteroids (Prednisone, Dexamethasone)</label>
+      <label><input type="checkbox" class="med" data-name="D2 Blockers" data-window="acute" data-weight="18" data-misdx="Akathisia misread as psychotic agitation" data-onset="1–48h"> D2 Blockers (Metoclopramide, Prochlorperazine)</label>
+      <label><input type="checkbox" class="med" data-name="Anticholinergics" data-window="acute" data-weight="17" data-misdx="Lewy Body Dementia, Delirium" data-onset="Hours–Days"> Anticholinergics (Oxybutynin, Scopolamine, Benztropine)</label>
+      <label><input type="checkbox" class="med" data-name="First-gen Antihistamines" data-window="acute" data-weight="15" data-misdx="Delirium, Visual hallucinations" data-onset="Hours"> First-gen Antihistamines (Diphenhydramine, Doxylamine)</label>
+      <label><input type="checkbox" class="med" data-name="Fluoroquinolones" data-window="acute" data-weight="18" data-misdx="New-onset Schizophrenia, Acute Stress Disorder" data-onset="48h–2 weeks"> Fluoroquinolones (Ciprofloxacin, Levofloxacin)</label>
+      <label><input type="checkbox" class="med" data-name="Dopaminergic Agents" data-window="acute" data-weight="15" data-misdx="Psychosis, Mania" data-onset="Days"> Dopaminergic Agents (Levodopa, Ropinirole)</label>
+    </div>
+
+    <div class="card">
+      <h3>Subacute Exposures (1–4 Weeks)</h3>
+      <label><input type="checkbox" class="med" data-name="SSRI/SNRI Activation" data-window="subacute" data-weight="12" data-misdx="Worsening anxiety misread as primary disorder" data-onset="Days–2 weeks"> SSRI/SNRI Activation</label>
+      <label><input type="checkbox" class="med" data-name="Benzodiazepine Paradoxical" data-window="subacute" data-weight="12" data-misdx="Disinhibition misread as mania" data-onset="Days"> Benzodiazepine / Z-drug Paradoxical Reaction</label>
+      <label><input type="checkbox" class="med" data-name="Antiepileptics" data-window="subacute" data-weight="13" data-misdx="Bipolar II, Intermittent Explosive Disorder" data-onset="Within weeks"> Antiepileptics (Levetiracetam, Topiramate, Carbamazepine)</label>
+      <label><input type="checkbox" class="med" data-name="Hormonal Contraception (new)" data-window="subacute" data-weight="13" data-misdx="MDD, Depersonalisation Disorder" data-onset="2 weeks–6 months"> Hormonal Contraception (initiated/changed)</label>
+      <label><input type="checkbox" class="med" data-name="Montelukast" data-window="subacute" data-weight="12" data-misdx="Bipolar Disorder, ODD (children)" data-onset="Days–Weeks"> Montelukast (FDA Black Box)</label>
+    </div>
+
+    <div class="card">
+      <h3>Chronic Exposures (Months+)</h3>
+      <label><input type="checkbox" class="med" data-name="PPI" data-window="chronic" data-weight="15" data-misdx="Bipolar I (mania), First-break Psychosis, Panic Disorder" data-onset="3–12 months"> Proton Pump Inhibitors (Omeprazole, Esomeprazole)</label>
+      <label><input type="checkbox" class="med" data-name="Metformin" data-window="chronic" data-weight="10" data-misdx="Depression from B12 depletion" data-onset="Months–Years"> Metformin (B12 depletion)</label>
+      <label><input type="checkbox" class="med" data-name="Hormonal Contraception (ongoing)" data-window="chronic" data-weight="12" data-misdx="MDD, Depersonalisation" data-onset="Ongoing"> Hormonal Contraception (ongoing)</label>
+      <label><input type="checkbox" class="med" data-name="Beta-Blockers" data-window="chronic" data-weight="10" data-misdx="Treatment-Resistant Depression" data-onset="2–8 weeks"> Beta-Blockers (Propranolol, Metoprolol)</label>
+      <label><input type="checkbox" class="med" data-name="Statins" data-window="chronic" data-weight="10" data-misdx="Intermittent Explosive Disorder, Bipolar II, Early Dementia" data-onset="Weeks–Months"> Statins (Atorvastatin, Simvastatin, Rosuvastatin)</label>
+      <label><input type="checkbox" class="med" data-name="H2 Antagonists" data-window="chronic" data-weight="11" data-misdx="Sundowner's Syndrome, Late-onset Psychosis, Dementia" data-onset="Days–Weeks"> H2 Antagonists (Famotidine), esp. elderly/renal impairment</label>
+      <label><input type="checkbox" class="med" data-name="Gabapentinoids" data-window="chronic" data-weight="12" data-misdx="Major Depression, Dissociative Disorder" data-onset="Weeks"> Gabapentinoids (Gabapentin, Pregabalin)</label>
+      <label><input type="checkbox" class="med" data-name="Opioids" data-window="chronic" data-weight="14" data-misdx="Major Depressive Episode (2.1x SI risk 7 days post-dose)" data-onset="24–168h post-exposure"> Opioids (Morphine, Fentanyl, Oxycodone)</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Marginal Deficiency + Pharmacologic Trigger Pattern (UPGRADE #6)</h3>
+    <div class="banner banner-warn">
+      ⚠️ <strong>PATTERN DETECTION:</strong> The most dangerous cascade involves patients with subclinical nutritional deficiencies who then receive medications that further deplete micronutrients or directly induce psychiatric symptoms. The medication acts as the final common pathway, unmasking a pre-existing vulnerability.
+    </div>
+    <label><input type="checkbox" id="ppiChronic"> Chronic PPI use (B12/Mg/Fe depletion substrate)</label>
+    <label><input type="checkbox" id="steroidTrigger"> Recent corticosteroid course (acute trigger)</label>
+    <label><input type="checkbox" id="lowFerritin"> Ferritin &lt;30 ng/mL documented (subclinical deficiency)</label>
+    <label><input type="checkbox" id="normalB12"> Serum B12 indeterminate (180–350 ng/L) and MMA not tested</label>
+    <div id="marginalAlert" style="display:none" class="banner banner-danger">
+      🚨 <strong>MARGINAL DEFICIENCY + PHARMACOLOGIC TRIGGER PATTERN DETECTED</strong><br>
+      Subclinical nutritional deficiencies from chronic PPI use, unmasked as acute psychiatric symptoms by corticosteroid.<br>
+      Without temporal medication mapping, the true cause remains invisible and PPL leads to progressive DUSI.<br>
+      <strong>Action:</strong> Check MMA/Homocysteine and Ferritin BEFORE psychiatric coding.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Environmental / Other Exposures</h3>
+    <label><input type="checkbox" class="exposure" value="heavy_metals"> Heavy metal exposure</label>
+    <label><input type="checkbox" class="exposure" value="solvents"> Solvent exposure</label>
+    <label><input type="checkbox" class="exposure" value="co"> Carbon monoxide exposure</label>
+    <label><input type="checkbox" class="exposure" value="pesticides"> Pesticide exposure</label>
+    <label><input type="checkbox" class="exposure" value="sleep_disorder"> Suspected sleep disorder (OSA, narcolepsy)</label>
+    <label><input type="checkbox" class="exposure" value="recent_infection"> Recent infection</label>
+    <label><input type="checkbox" class="exposure" value="recreational"> Recreational substances</label>
+    <h4>Free-Text Medication Notes</h4>
+    <textarea id="medNotes" placeholder="List all prescriptions, OTC medications, supplements, antibiotics, steroids, analgesics, contraceptives, alcohol/substance use, and recent ED visits with dates where possible."></textarea>
+  </div>
+</section>
+
+<!-- ==================== TAB 4: FESS LABS ==================== -->
+<section id="tab-labs" class="panel">
+  <div class="banner banner-info">
+    🔬 <strong>ROUTINE TESTS HAVE LIMITS:</strong> A normal routine panel does not rule out a somatic cause.
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>FESS Panel Status</h3>
+      <table>
+        <tr><th>Test</th><th>Status</th><th>Trap</th><th>Evidence level (Table 5)</th></tr>
+        <tr><td>Serum B12</td><td><select class="lab" data-test="b12"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Normal B12 misses functional deficiency</td><td>A: established mimic</td></tr>
+        <tr><td>MMA (Methylmalonic Acid)</td><td><select class="lab" data-test="mma"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Second-line test when B12 is indeterminate; judged against the local laboratory range</td><td>A: established mimic</td></tr>
+        <tr><td>Homocysteine</td><td><select class="lab" data-test="homocysteine"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Elevated &gt;12 µmol/L = functional deficiency</td><td>A: established mimic</td></tr>
+        <tr><td>RBC Folate</td><td><select class="lab" data-test="folate"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Serum folate masked by fortified diets</td><td>B: plausible contributor</td></tr>
+        <tr><td>Ferritin / Iron Studies</td><td><select class="lab" data-test="ferritin"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Normal Hb ≠ normal iron. Ferritin &lt;30 = deficiency</td><td>B: plausible contributor</td></tr>
+        <tr><td>RBC Magnesium</td><td><select class="lab" data-test="rbc_mg"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Investigational (Table 5, Level C). Research use only</td><td>C: investigational</td></tr>
+        <tr><td>25-OH Vitamin D</td><td><select class="lab" data-test="vitd"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>OR 4.96 for moderate-severe depression if deficient</td><td>B: plausible contributor</td></tr>
+        <tr><td>Serum Copper + 24h Urine Cu</td><td><select class="lab" data-test="copper"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Ceruloplasmin unreliable (acute phase reactant)</td><td>B: plausible contributor</td></tr>
+        <tr><td>TSH / Free T4 / Free T3 / TPOAb</td><td><select class="lab" data-test="thyroid"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Euthyroid labs miss antibody-positive disease</td><td>A: established mimic</td></tr>
+        <tr><td>Morning Cortisol</td><td><select class="lab" data-test="cortisol"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Cushing's/Addison's missed without targeted testing</td><td>Not graded in Table 5</td></tr>
+        <tr><td>CBC</td><td><select class="lab" data-test="cbc"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>n/a</td><td>Not graded in Table 5</td></tr>
+        <tr><td>Metabolic Panel</td><td><select class="lab" data-test="metabolic"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>n/a</td><td>Not graded in Table 5</td></tr>
+        <tr><td>ESR / CRP</td><td><select class="lab" data-test="inflammatory"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Autoimmune/inflammatory mimics</td><td>Not graded in Table 5</td></tr>
+        <tr><td>HIV / Syphilis Serology</td><td><select class="lab" data-test="infection"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Neurosyphilis, HIV presenting as psychiatric</td><td>A: established mimic</td></tr>
+        <tr><td>Urine Drug Screen / Toxicology</td><td><select class="lab" data-test="tox"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>n/a</td><td>A: established mimic</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <p style="font-size:.8rem;color:var(--muted);margin:8px 0"><strong>Evidence levels</strong> follow Table 5 of the PPL-DUSI paper. A = established mimics. B = plausible contributors. C = investigational, research use only, should not delay or change a psychiatric diagnosis.</p>
+      <h3>Critical Lab Interpretation Notes</h3>
+
+      <h4>B12 / MMA / Homocysteine</h4>
+      <div class="banner banner-warn">
+        ⚠️ Serum B12 in the indeterminate range (180–350 ng/L) does not rule out deficiency.<br>
+                Test: total or active B12 (holotranscobalamin) first. If the result is indeterminate, MMA is the second-line test, judged against the local laboratory range. Homocysteine: treat according to national guidance.<br>
+        Always check B12 status before folate supplementation.
+      </div>
+
+      <h4>Magnesium</h4>
+      <div class="banner banner-warn">
+        ⚠️ Serum magnesium is tightly regulated, so a normal serum level does not exclude low body stores. No well-validated test of body stores exists.<br>
+        <strong>Red-cell magnesium is investigational (Table 5, Level C):</strong> research use only, not a routine screening test. It should not delay or change a psychiatric diagnosis.
+      </div>
+
+      <h4>Copper</h4>
+      <div class="banner banner-warn">
+        ⚠️ Ceruloplasmin is an acute-phase reactant, elevated by oestrogen, inflammation, pregnancy.<br>
+        <strong>Unreliable as standalone marker.</strong> Serum copper + 24-hour urine copper (with contamination precautions) required.<br>
+        Deficiency risk: post-bariatric surgery, TPN, excess zinc, cystic fibrosis.<br>
+        Excess: Wilson's disease, OCP, carbamazepine, phenobarbital.
+      </div>
+
+      <h4>The "Low-Normal" Trap</h4>
+      <div class="banner banner-danger">
+        🚨 Serum B12 in the indeterminate range is not reassuring. MMA is the second-line test, judged against the local laboratory range.<br>
+                Check MMA and homocysteine, not serum B12 alone.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== TAB 5: DIAGNOSTIC PAUSE ==================== -->
+<section id="tab-pause" class="panel">
+
+  <div class="banner banner-danger" style="font-size:1rem;">
+    🛑 <strong>CLINICAL URGENCY CLARIFICATION (UPGRADE #2)</strong><br><br>
+    This pause is a <strong>DOCUMENTATION REQUIREMENT</strong>, NOT a treatment delay.<br><br>
+    Chemical sedation, physical restraint, involuntary hold, and emergency psychiatric admission may proceed <strong>IMMEDIATELY</strong> when clinically indicated.<br><br>
+    The pause requires that the workup was <strong>ORDERED</strong> and that the psychiatric diagnosis is recorded as <strong>PROVISIONAL</strong> pending results.<br><br>
+    <strong>This protocol must NEVER delay care for a patient in acute danger.</strong>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>EHR-Enforced Diagnostic Pause</h3>
+      <div class="banner banner-warn">
+        ⚠️ <strong>FIRST-EPISODE PSYCHIATRIC PRESENTATION DETECTED</strong><br>
+        Before finalising psychiatric diagnosis, complete the following:
+      </div>
+      <label><input type="checkbox" id="fessComplete"> FESS completed AND results reviewed (abnormal results addressed)</label>
+      <label><input type="checkbox" id="medMapComplete"> Temporal medication / exposure map completed (6-month window, including collateral)</label>
+      <label><input type="checkbox" id="differentialDocumented"> Somatic, metabolic, toxicologic, and pharmacologic differential documented</label>
+
+      <h4>Override</h4>
+      <select id="overrideReason">
+        <option value="none">None</option>
+        <option value="refused">Patient refused workup</option>
+        <option value="emergency">Immediate danger / Emergency treatment required</option>
+        <option value="clear">Clear psychiatric presentation, no red flags</option>
+        <option value="transfer">Emergency transfer before workup</option>
+        <option value="resources">Laboratory resources unavailable</option>
+        <option value="other">Other</option>
+      </select>
+      <label>Override Justification
+        <textarea id="overrideText" placeholder="Free-text clinical justification. Attending co-signature required within 24 hours."></textarea>
+      </label>
+      <label>Clinician / Reviewer
+        <input type="text" id="clinician" placeholder="Name and role">
+      </label>
+    </div>
+
+    <div class="card">
+      <h3>Comorbidity Decision Algorithm (UPGRADE #1)</h3>
+      <div class="banner banner-info">
+        ℹ️ The most common real-world scenario is <strong>genuine psychiatric–somatic comorbidity</strong>: a patient who has BOTH major depression AND hypothyroidism, BOTH schizophrenia AND B12 deficiency.
+      </div>
+
+      <h4>Select Applicable Scenario:</h4>
+      <label><input type="radio" name="comorbidity" value="fess_pos_psych_pos"> FESS positive AND psychiatric criteria met</label>
+      <label><input type="radio" name="comorbidity" value="fess_pos_emergency"> FESS positive AND psychiatric emergency</label>
+      <label><input type="radio" name="comorbidity" value="fess_neg_psych_pos"> FESS negative AND psychiatric criteria met</label>
+      <label><input type="radio" name="comorbidity" value="not_applicable"> Not applicable / No comorbidity question</label>
+
+      <div id="comorbidityGuide" style="display:none" class="banner banner-ok">
+        <strong>SEQUENCING ALGORITHM:</strong><br><br>
+        <strong>Scenario 1: FESS positive + Psychiatric criteria met:</strong><br>
+        → Treat somatic cause FIRST.<br>
+        → Reassess psychiatric symptoms after 4–6 weeks of adequate somatic treatment.<br>
+        → Assign psychiatric diagnosis ONLY if symptoms persist after somatic correction.<br>
+        → This is standard endocrine practice for hypothyroidism presenting with depression.<br><br>
+        <strong>Scenario 2: FESS positive + Psychiatric emergency:</strong><br>
+        → Treat BOTH concurrently.<br>
+        → Initiate necessary psychiatric interventions (e.g., antipsychotics for acute psychosis with imminent danger).<br>
+        → Simultaneously correct the somatic cause.<br>
+        → Document BOTH diagnoses as PROVISIONAL.<br><br>
+        <strong>Scenario 3: FESS negative + Psychiatric criteria met:</strong><br>
+        → Assign psychiatric diagnosis with CONFIDENCE.<br>
+        → Somatic mimics have been excluded.<br>
+        → This STRENGTHENS the validity of the psychiatric diagnosis.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Four Pathways Checked</h3>
+      <div class="pathway-box p1"><strong>01 · Cognitive Bias:</strong> Premature closure, anchoring, administrative triage under pressure.</div>
+      <div class="pathway-box p2"><strong>02 · Misattribution:</strong> Nutrient, endocrine, infectious, autoimmune, medication mimics.</div>
+      <div class="pathway-box p3"><strong>03 · Uninterrupted Exposure:</strong> Causative medication or toxin continues unchecked.</div>
+      <div class="pathway-box p4"><strong>04 · Pharmacologic Masking:</strong> Psychiatric treatment suppresses symptoms while somatic illness progresses.</div>
+      <div class="pathway-box p5"><strong>Protocol Goal:</strong> Convert diagnostic humility from an individual virtue into a structural requirement.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== TAB 6: RESULTS ==================== -->
+<section id="tab-results" class="panel">
+  <div class="rs-bar">
+    <p id="runStatus" class="run-status"></p>
+    <div class="rs-actions">
+      <button class="btn-secondary" onclick="showTab('patient')">← Back to inputs</button>
+      <button class="btn-secondary" onclick="printReport()">Print or save as PDF</button>
+      <button class="btn-secondary" onclick="exportReport()">⬇ Export text</button>
+    </div>
+    <nav class="rs-jump">
+      <a href="#sec-risk">Risk</a><a href="#sec-context">Context</a><a href="#sec-pause">Pause</a><a href="#sec-pathways">Pathways</a><a href="#sec-alerts">Alerts</a><a href="#sec-actions">Actions</a><a href="#sec-meds">Medications</a><a href="#sec-nutrients">Nutrients</a><a href="#sec-diff">Differential</a><a href="#sec-gaps">Workup gaps</a>
+    </nav>
+  </div>
+  <div id="reportBody"><p class="muted">Run the analysis to see the full report here.</p></div>
+</section>
+
+</main>
+
+<div id="aboutPanel" class="about-panel" style="display:none">
+    <div class="about-section" style="padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 0.9em; color: #495057;">
+        <h3>About this engine</h3>
+        <p>The <strong>PPL–DUSI Diagnostic Engine v4.11</strong> is an educational, browser-based clinical decision-support prototype built on the PPL–DUSI framework: Premature Psychiatric Labelling and Duration of Untreated Somatic Illness. It operationalizes the First-Episode Somatic Screen (FESS), Temporal Medication Mapping, and the EHR-Enforced Diagnostic Pause.</p>
+        <p><strong>Based on:</strong><br>
+        Noire, E. (2026). <em>Premature Psychiatric Labelling and Duration of Untreated Somatic Illness: A Theoretical Framework and Clinical Safeguard Protocol</em>. Preprint. DOI: <a href="[INSERT PREPRINTS.ORG DOI HERE]" target="_blank">[INSERT PREPRINTS.ORG DOI HERE]</a></p>
+        <p><strong>Engine Archive:</strong><br>
+        Zenodo DOI: <a href="[INSERT ZENODO DOI HERE]" target="_blank">[INSERT ZENODO DOI HERE]</a></p>
+        <p><strong>Defensive Publication Notice:</strong><br>
+        The theoretical framework of Premature Psychiatric Labelling (PPL), Duration of Untreated Somatic Illness (DUSI), and the associated First-Episode Somatic Screen (FESS) protocol are published as defensive prior art to prevent third-party patenting, while retaining copyright and academic attribution.</p>
+        <p><strong>Licence and Contact:</strong><br>
+        © 2026 Eeta Noire. Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a>.<br>
+        ORCID: <a href="https://orcid.org/0009-0000-6566-2214" target="_blank">0009-0000-6566-2214</a><br>
+        Email: <a href="mailto:eeta@eetanoire.com">eeta@eetanoire.com</a><br>
+        Web: <a href="https://psychopoetics.io" target="_blank">psychopoetics.io</a></p>
+        <p style="color: #dc3545; font-weight: bold; margin-top: 15px;">
+            ⚠️ Clinical Disclaimer: Educational decision-support prototype only. Not a diagnosis, emergency triage system, or substitute for professional judgment, examination, laboratory confirmation, specialist consultation, or local protocols. Runs locally in your browser; no data is transmitted.
+        </p>
+    </div>
+  </div>
+<footer class="ftr-min">
+  <span>PPL–DUSI v4.11 · © 2026 Eeta Noire · CC BY-NC 4.0 · Not for clinical decisions</span>
+  <button class="about-toggle" id="aboutBtn" aria-expanded="false" aria-controls="aboutPanel" onclick="toggleAbout()">About</button>
+</footer>
+
+
+<script>
+// ==================== TAB NAVIGATION ====================
+function showTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  const target = btn || document.querySelector('.tab-btn[data-tab="' + id + '"]');
+  if (target) { target.classList.add('active'); target.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+  const headerH = document.getElementById('hdr').offsetHeight;
+  const top = document.getElementById('tab-' + id).getBoundingClientRect().top;
+  if (top < headerH + 8) window.scrollTo({ top: window.scrollY + top - headerH - 16, behavior: 'smooth' });
+}
+
+// ==================== DYNAMIC ALERTS ====================
+document.getElementById('alcohol').addEventListener('change', function() {
+  const v = this.value;
+  document.getElementById('wernickeAlert').style.display =
+    (v === 'aud' || v === 'withdrawal' || v === 'intoxicated') ? 'block' : 'none';
+});
+
+document.querySelectorAll('input[name="resourceMode"]').forEach(r => {
+  r.addEventListener('change', function() {
+    document.getElementById('lowResourceNote').style.display =
+      this.value === 'limited' ? 'block' : 'none';
+  });
+});
+
+function checkGenderAge() {
+  const age = parseInt(document.getElementById('age').value) || 0;
+  const sex = document.getElementById('sex').value;
+  document.getElementById('genderAlert').style.display =
+    (sex === 'female' && age >= 18 && age <= 50) ? 'block' : 'none';
+  document.getElementById('olderAdultAlert').style.display =
+    (age >= 65) ? 'block' : 'none';
+  if (age >= 65) document.getElementById('olderAdultFocus').checked = true;
+}
+document.getElementById('age').addEventListener('input', checkGenderAge);
+document.getElementById('sex').addEventListener('change', checkGenderAge);
+
+document.querySelectorAll('.aeFlag').forEach(cb => {
+  cb.addEventListener('change', function() {
+    const any = document.querySelectorAll('.aeFlag:checked').length > 0;
+    document.getElementById('aeAlert').style.display = any ? 'block' : 'none';
+  });
+});
+
+function checkMarginal() {
+  const ppi = document.getElementById('ppiChronic').checked;
+  const steroid = document.getElementById('steroidTrigger').checked;
+  document.getElementById('marginalAlert').style.display =
+    (ppi && steroid) ? 'block' : 'none';
+}
+document.getElementById('ppiChronic').addEventListener('change', checkMarginal);
+document.getElementById('steroidTrigger').addEventListener('change', checkMarginal);
+
+document.querySelectorAll('input[name="comorbidity"]').forEach(r => {
+  r.addEventListener('change', function() {
+    document.getElementById('comorbidityGuide').style.display =
+      this.value !== 'not_applicable' ? 'block' : 'none';
+  });
+});
+
+// ==================== ANALYSIS ENGINE ====================
+function runAnalysis() {
+  const ageIn = parseInt(document.getElementById('age').value) || 0;
+  if (ageIn > 0 && ageIn < 18) {
+    document.getElementById('runStatus').textContent = 'This engine is for adults aged 18 and over. Analysis not run.';
+    showTab('results');
+    return;
+  }
+  let score = 0;
+  const alerts = [];
+  const actions = [];
+  const medMatches = [];
+  const nutrients = [];
+  const diffs = [];
+  const gaps = [];
+  const pathways = [];
+
+  // Patient context
+  const age = parseInt(document.getElementById('age').value) || 0;
+  const sex = document.getElementById('sex').value;
+  const alcohol = document.getElementById('alcohol').value;
+  const firstEpisode = document.getElementById('firstEpisode').checked;
+  const psychMeds = document.getElementById('psychMeds').checked;
+  const resourceMode = document.querySelector('input[name="resourceMode"]:checked').value;
+
+  if (firstEpisode) { score += 8; alerts.push('First-episode presentation: PPL protocol mandatory.'); }
+  if (age >= 65) { score += 10; alerts.push('Age ≥65: anticholinergic burden, sedatives, delirium, infection, polypharmacy receive additional weight.'); pathways.push('P1: Cognitive bias amplified by age-related diagnostic complexity.'); }
+    if (sex === 'female' && age >= 18 && age <= 50) { score += 7; alerts.push('Woman aged 18–50: factors that may raise risk, not measured here: menstrual iron loss, hormonal contraception, credibility discounting.'); }
+  if (alcohol === 'aud' || alcohol === 'withdrawal') { score += 12; alerts.push('WERNICKE-KORSACOFF RISK: Parenteral thiamine BEFORE glucose. Classic triad in <10%. Give parenteral thiamine first; dosing per local protocol.'); actions.push('Administer parenteral thiamine immediately.'); }
+  if (psychMeds) { score += 6; alerts.push('Psychotropic already started: Pathway 4 (Pharmacologic Masking) risk. Partial response may validate wrong diagnosis.'); pathways.push('P4: Pharmacologic masking: psychotropic may suppress symptoms while somatic illness progresses.'); }
+
+  // Symptoms
+  const symptoms = Array.from(document.querySelectorAll('.symptom:checked')).map(c => c.value);
+  score += Math.min(symptoms.length * 3, 25);
+  if (symptoms.includes('hallucinations')) { score += 8; alerts.push('Hallucinations: MEDICAL EMERGENCY until iatrogenic/delirium causes excluded.'); actions.push('Prioritize delirium and medication-induced hallucination workup.'); }
+  if (symptoms.includes('suicidal')) { score += 10; alerts.push('Suicidal ideation: Safety watch. Consider iatrogenic drivers (tramadol, fluoroquinolones, corticosteroids, akathisia, SSRI activation).'); actions.push('Ensure immediate safety planning while medical rule-out completed.'); }
+  if (symptoms.includes('delirium')) { score += 8; alerts.push('Delirium pattern: psychiatric diagnosis must NOT be finalised until delirium excluded.'); }
+  if (symptoms.includes('akathisia')) { score += 8; alerts.push('Akathisia: consider D2 blockers. Misreading akathisia as psychotic worsening triggers harmful medication escalation.'); }
+
+  // Red flags
+  const redflags = Array.from(document.querySelectorAll('.redflag:checked')).map(c => c.value);
+  score += redflags.length * 6;
+  if (redflags.length > 0) { alerts.push(`Medical red flags present: ${redflags.join(', ')}. Urgent medical evaluation required.`); actions.push('Escalate for urgent medical assessment.'); }
+
+  // AE flags
+  const aeFlags = Array.from(document.querySelectorAll('.aeFlag:checked')).map(c => c.value);
+  if (aeFlags.length > 0) { score += 10; alerts.push('AUTOIMMUNE ENCEPHALITIS WORKUP TRIGGERED: Order autoantibody panel, CSF, EEG, MRI.'); actions.push('Do NOT close as primary psychiatric illness without AE exclusion.'); }
+
+  // Medications
+  const meds = Array.from(document.querySelectorAll('.med:checked'));
+  meds.forEach(m => {
+    const w = parseInt(m.dataset.weight) || 10;
+    score += w;
+    medMatches.push(`<strong>${m.dataset.name}</strong>: Misdiagnosed as: ${m.dataset.misdx}. Onset: ${m.dataset.onset}.`);
+  });
+  if (meds.length >= 3) { score += 8; alerts.push(`Polypharmacy (${meds.length} agents): Cumulative CNS burden. Calculate Anticholinergic Cognitive Burden (ACB) score.`); actions.push('Review all medications for interactions. Consider deprescribing.'); }
+  if (meds.length >= 5) { score += 12; alerts.push('Mandatory pharmacist review required before diagnostic closure.'); }
+
+  // Marginal deficiency pattern
+  const ppi = document.getElementById('ppiChronic').checked;
+  const steroid = document.getElementById('steroidTrigger').checked;
+  if (ppi && steroid) { score += 10; alerts.push('MARGINAL DEFICIENCY + PHARMACOLOGIC TRIGGER PATTERN: PPI depletion + steroid trigger. Check MMA/Homocysteine and Ferritin BEFORE psychiatric coding.'); nutrients.push('PPI → B12/Mg/Fe depletion → Steroid unmasks as acute psychiatric symptoms.'); }
+
+  // Onset
+  const onset = document.querySelector('input[name="onset"]:checked')?.value;
+  if (onset === 'acute') { score += 12; alerts.push('Acute onset (<72h): Tight temporal medication correlation required.'); }
+  if (onset === 'subacute') score += 8;
+  if (onset === 'chronic') score += 5;
+
+  // Labs
+  const labs = {};
+  document.querySelectorAll('.lab').forEach(s => { labs[s.dataset.test] = s.value; });
+  const notDone = Object.entries(labs).filter(([k,v]) => v === 'Not done' && k !== 'rbc_mg').map(([k]) => k);
+  if (notDone.length > 0) { gaps.push(`Incomplete FESS: ${notDone.join(', ')}.`); }
+  if (labs.b12 === 'Normal' && labs.mma === 'Not done') { alerts.push('B12 indeterminate or normal with MMA not tested: MMA is the second-line test, judged against the local laboratory range.'); gaps.push('Order MMA + Homocysteine.'); }
+  if (labs.ferritin === 'Not done') gaps.push('Ferritin not done: normal Hb does NOT exclude iron deficiency.');
+  if (labs.vitd === 'Not done') gaps.push('25-OH Vitamin D not done: OR 4.96 for depression if deficient.');
+  if (labs.copper === 'Not done' && meds.some(m => m.dataset.name.includes('Hormonal') || m.dataset.name.includes('Carbamazepine'))) gaps.push('Copper studies not done despite copper-elevating medication.');
+
+  // Nutrient patterns
+  if (meds.some(m => m.dataset.name === 'PPI')) nutrients.push('PPI: B12, Mg, Fe depletion. Check B12 (MMA if indeterminate) and ferritin.');
+  if (meds.some(m => m.dataset.name === 'Metformin')) nutrients.push('Metformin: B12 depletion. Check MMA/Homocysteine.');
+  if (alcohol === 'aud' || alcohol === 'withdrawal') nutrients.push('Alcohol: Thiamine (B1), B12, Folate, Mg, Phosphate depletion. Wernicke-Korsakoff risk.');
+  if (sex === 'female' && age >= 18 && age <= 50) nutrients.push('Woman aged 18–50: menstruation can deplete iron. Check ferritin if heavy bleeding is reported.');
+
+  // Differential
+  if (symptoms.includes('depression') || symptoms.includes('fatigue')) diffs.push('Depression/Fatigue: Hypothyroidism, B12/folate deficiency, Ferritin <30, Vitamin D deficiency, Beta-blocker/PPI effects, Adrenal disorders.');
+  if (symptoms.includes('anxiety')) diffs.push('Anxiety/Panic: Hyperthyroidism, Pheochromocytoma, POTS, Mg deficiency, Akathisia, Tramadol, Stimulant exposure.');
+  if (symptoms.includes('psychosis') || symptoms.includes('hallucinations')) diffs.push('Psychosis/Hallucinations: Delirium, Medication-induced, Autoimmune encephalitis, Neurosyphilis, B12/Copper dysregulation, Wilson\'s disease, Temporal lobe epilepsy.');
+  if (symptoms.includes('mania')) diffs.push('Mania/Agitation: Corticosteroids, Hyperthyroidism, SSRI activation, Copper excess, Encephalitis.');
+  if (symptoms.includes('cognitive')) diffs.push('Cognitive: B12 deficiency, Hypothyroidism, Anticholinergic burden, Sleep disorder, HIV/Syphilis.');
+
+  // Pathways
+  if (onset === 'acute' || document.getElementById('setting').value === 'Emergency Department') pathways.push('P1: Cognitive bias: Premature closure, anchoring, administrative triage under pressure.');
+  if (nutrients.length > 0 || medMatches.length > 0) pathways.push('P2: Misattribution: Somatic mimics detected. FESS required before psychiatric coding.');
+  if (meds.some(m => m.dataset.window === 'chronic')) pathways.push('P3: Uninterrupted exposure: Causative agent may continue unchecked. Discontinue/review before diagnostic closure.');
+  if (psychMeds) pathways.push('P4: Pharmacologic masking: Psychotropic may suppress symptoms while somatic illness progresses. Reassess after somatic correction.');
+
+  // Pause status
+  const fessComplete = document.getElementById('fessComplete').checked;
+  const medMapComplete = document.getElementById('medMapComplete').checked;
+  const diffDocumented = document.getElementById('differentialDocumented').checked;
+  const override = document.getElementById('overrideReason').value;
+  const overrideText = document.getElementById('overrideText').value.trim();
+  let pauseHTML = '';
+  if (!firstEpisode) {
+    pauseHTML = '<div class="banner banner-info">PPL pause not mandatory for established diagnosis. Somatic re-evaluation still recommended (overshadowing risk).</div>';
+  } else if (override !== 'none') {
+    pauseHTML = overrideText
+      ? `<div class="banner banner-warn">Override documented: ${override}. Justification: ${overrideText}. Flag for peer review if diagnosis later revised.</div>`
+      : '<div class="banner banner-danger">Override selected but NO justification documented. Pause INCOMPLETE. Audit required.</div>';
+  } else if (fessComplete && medMapComplete && diffDocumented) {
+    pauseHTML = '<div class="banner banner-ok">✅ Safeguard COMPLETE: Somatic, metabolic, toxicologic, pharmacologic rule-out documented. Psychiatric diagnosis may proceed with greater validity.</div>';
+  } else {
+    pauseHTML = '<div class="banner banner-danger">🛑 PAUSE: Incomplete safeguard. Do NOT finalise first-episode psychiatric diagnosis until FESS review, temporal medication map, and rule-out differential are documented.</div>';
+  }
+
+  // Cap score
+  score = Math.min(100, Math.max(0, score));
+  let cat = 'Low', catClass = 'badge-ok', color = '#22c55e';
+  if (score >= 85) { cat = 'Very High'; catClass = 'badge-danger'; color = '#ef4444'; }
+  else if (score >= 60) { cat = 'High'; catClass = 'badge-danger'; color = '#f97316'; }
+  else if (score >= 30) { cat = 'Moderate'; catClass = 'badge-warn'; color = '#f59e0b'; }
+
+  // Render
+const rs = document.getElementById('runStatus'); if (rs) rs.textContent = 'Analysis complete at ' + new Date().toLocaleTimeString() + '. Risk ' + score + '/100 (' + cat + '). Full analysis below. Review the Diagnostic Pause section before finalising any diagnosis.';
+
+
+  // Quality metrics (simulated for single-patient view)
+
+  // Generate structured report (UPGRADE #12)
+  const report = [
+    '═══════════════════════════════════════════════════',
+    ' PPL-DUSI CLINICAL SAFEGUARD REPORT',
+    ' Generated: ' + new Date().toISOString(),
+    ' Engine: PPL-DUSI Diagnostic Engine v4.11',
+    '═══════════════════════════════════════════════════',
+    '',
+    'PATIENT CONTEXT',
+    ' Age: ' + (age || 'Not entered'),
+    ' Sex: ' + (sex || 'Not entered'),
+    ' Setting: ' + document.getElementById('setting').value,
+    ' First Episode: ' + (firstEpisode ? 'Yes' : 'No'),
+    ' Alcohol Context: ' + alcohol,
+    ' Resource Mode: ' + resourceMode,
+    '',
+    'ONSET WINDOW: ' + (onset || 'Not selected'),
+    'SYMPTOMS: ' + (symptoms.length ? symptoms.join(', ') : 'None selected'),
+    'RED FLAGS: ' + (redflags.length ? redflags.join(', ') : 'None'),
+    'AE FLAGS: ' + (aeFlags.length ? aeFlags.join(', ') : 'None'),
+    '',
+    'FESS STATUS: ' + (fessComplete ? 'Complete' : 'Incomplete'),
+    ' Incomplete tests: ' + (notDone.length ? notDone.join(', ') : 'None'),
+    'TEMPORAL MEDICATION MAP: ' + (medMapComplete ? 'Complete' : 'Incomplete'),
+    ' Medications identified: ' + meds.map(m => m.dataset.name).join(', '),
+    'DIFFERENTIAL DOCUMENTED: ' + (diffDocumented ? 'Yes' : 'No'),
+    '',
+    'DIAGNOSTIC PAUSE: ' + (override !== 'none' ? 'OVERRIDE: ' + override : (fessComplete && medMapComplete && diffDocumented ? 'CLEARED' : 'INCOMPLETE')),
+    ' Override Justification: ' + (overrideText || 'N/A'),
+    ' Clinician: ' + (document.getElementById('clinician').value || 'Not entered'),
+    '',
+    'COMORBIDITY ALGORITHM: ' + (document.querySelector('input[name="comorbidity"]:checked')?.value || 'Not selected'),
+    '',
+    'PPL RISK SCORE: ' + score + '/100 (' + cat + ')',
+    '',
+    'PATHWAY ALERTS:',
+    ...pathways.map(p => ' • ' + p),
+    '',
+    'HIGH-PRIORITY ALERTS:',
+    ...alerts.map(a => ' • ' + a),
+    '',
+    'IMMEDIATE ACTIONS:',
+    ...actions.map(a => ' • ' + a),
+    '',
+    'MEDICATION MATCHES:',
+    ...medMatches.map(m => ' • ' + m.replace(/<[^>]*>/g, '')),
+    '',
+    'NUTRIENT PATTERNS:',
+    ...nutrients.map(n => ' • ' + n),
+    '',
+    'DIAGNOSTIC DIFFERENTIAL:',
+    ...diffs.map(d => ' • ' + d),
+    '',
+    'WORKUP GAPS:',
+    ...gaps.map(g => ' • ' + g),
+    '',
+    '═══════════════════════════════════════════════════',
+    ' DISCLAIMER: Educational decision-support prototype.',
+    ' Not a diagnosis. Not a substitute for professional',
+    ' judgment, examination, laboratory confirmation,',
+    ' specialist consultation, or local protocols.',
+    '═══════════════════════════════════════════════════'
+  ].join('\n');
+
+  window._lastReport = report;
+
+  const li = arr => arr.length ? '<ul>' + arr.map(x => '<li>' + x + '</li>').join('') + '</ul>' : '<p class="muted">None.</p>';
+  const sec = (id, title, body) => '<section class="rep-sec" id="' + id + '"><h2>' + title + '</h2>' + body + '</section>';
+  const ctx = li([
+    'Age: ' + (age || 'not entered'), 'Sex: ' + (sex || 'not entered'),
+    'Setting: ' + document.getElementById('setting').value,
+    'First episode: ' + (firstEpisode ? 'yes' : 'no'),
+    'Alcohol context: ' + alcohol, 'Resource mode: ' + resourceMode,
+    'Onset window: ' + (onset || 'not selected'),
+    'Symptoms: ' + (symptoms.length ? symptoms.join(', ') : 'none selected'),
+    'Red flags: ' + (redflags.length ? redflags.join(', ') : 'none')]);
+  document.getElementById('reportBody').innerHTML =
+    sec('sec-risk', 'Risk', '<div class="score">' + score + '/100 · ' + cat + '</div>') +
+    sec('sec-context', 'Patient context', ctx) +
+    sec('sec-pause', 'Diagnostic pause', pauseHTML) +
+    sec('sec-pathways', 'Four pathways', li(pathways)) +
+    sec('sec-alerts', 'High-priority alerts', li(alerts)) +
+    sec('sec-actions', 'Immediate actions', li(actions)) +
+    sec('sec-meds', 'Medication matches', li(medMatches)) +
+    sec('sec-nutrients', 'Nutrient and functional patterns', li(nutrients)) +
+    sec('sec-diff', 'Differential', li(diffs)) +
+    sec('sec-gaps', 'Workup gaps', li(gaps)) +
+    '<p class="rep-foot">Educational decision support only. Not a diagnosis, emergency triage system, or substitute for professional judgment, examination, laboratory confirmation, specialist consultation, or local protocols.</p>';
+  showTab('results');
+  document.getElementById('tab-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderList(id, items, empty) {
+  const el = document.getElementById(id);
+  if (!items.length) { el.innerHTML = `<p style="color:var(--muted)">${empty}</p>`; return; }
+  if (id === 'pathwayAlerts') { el.innerHTML = items.join(''); return; }
+  el.innerHTML = '<ul style="padding-left:20px;">' + items.map(i => `<li style="margin:6px 0;">${i}</li>`).join('') + '</ul>';
+}
+
+// ==================== EXPORT ====================
+function exportReport() {
+  if (!window._lastReport) { runAnalysis(); }
+  const blob = new Blob([window._lastReport], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'PPL-DUSI-Clinical-Safeguard-Report-' + new Date().toISOString().slice(0,10) + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+}
+
+// ==================== CLEAR ====================
+function clearAll() {
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+    else el.value = '';
+  });
+  document.getElementById('firstEpisode').checked = true;
+  document.querySelector('input[name="onset"][value="acute"]').checked = true;
+  document.querySelector('input[name="resourceMode"][value="full"]').checked = true;
+  document.querySelectorAll('.lab').forEach(s => s.value = 'Not done');
+  ['wernickeAlert','lowResourceNote','genderAlert','olderAdultAlert','aeAlert','marginalAlert','comorbidityGuide'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  window._lastReport = '';
+  document.getElementById('runStatus').textContent = '';
+  updateTabDots();
+  document.getElementById('reportBody').innerHTML = '<p class="muted">Run the analysis to see the full report here.</p>';
+  showTab('patient');
+}
+
+function updateTabDots() {
+  const hasAge = document.getElementById('age').value !== '';
+  const hasSex = document.getElementById('sex').value !== '';
+  const hasSymptom = document.querySelectorAll('.symptom:checked').length > 0;
+  document.getElementById('dot-patient').style.display = (hasAge && hasSex) ? 'none' : 'inline-block';
+  document.getElementById('dot-symptoms').style.display = hasSymptom ? 'none' : 'inline-block';
+}
+document.addEventListener('input', updateTabDots);
+document.addEventListener('change', updateTabDots);
+updateTabDots();
+(function () {
+  const hdr = document.getElementById('hdr');
+  window.addEventListener('scroll', function () {
+    const y = window.scrollY;
+    if (!hdr.classList.contains('compact') && y > 140) hdr.classList.add('compact');
+    if (hdr.classList.contains('compact') && y < 40) hdr.classList.remove('compact');
+  }, { passive: true });
+})();
+
+function toggleAbout() {
+  const p = document.getElementById('aboutPanel');
+  const btn = document.getElementById('aboutBtn');
+  const open = p.style.display === 'none';
+  p.style.display = open ? 'block' : 'none';
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+function printReport() {
+  document.body.classList.add('print-report');
+  window.addEventListener('afterprint', function done() {
+    document.body.classList.remove('print-report');
+    window.removeEventListener('afterprint', done);
+  });
+  window.print();
+}
+
+function syncHdr() {
+  document.documentElement.style.setProperty('--hdr-h', document.getElementById('hdr').offsetHeight + 'px');
+}
+window.addEventListener('resize', syncHdr);
+window.addEventListener('scroll', syncHdr, { passive: true });
+syncHdr();
+</script>
+</body>
+</html>
