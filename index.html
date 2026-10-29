@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PPL–DUSI Diagnostic Engine v4.11 | Somatic Masquerade Suite</title>
+<title>PPL–DUSI Diagnostic Engine V5 | Somatic Masquerade Suite</title>
 <style>
 :root {
   --bg: #0a0f1a;
@@ -176,15 +176,15 @@ tr:hover { background: rgba(56,189,248,0.05); }
   <div class="hdr-inner">
     <div class="hdr-brand">
       <div class="hdr-kicker">Noire E. PPL-DUSI Framework. Preprint, 2026.</div>
-      <h1><span>PPL–DUSI</span> Diagnostic Engine <small>v4.11</small></h1>
+      <h1><span>PPL–DUSI</span> Diagnostic Engine <small>V5.2</small></h1>
       <div class="hdr-badges">
-        <span>12 upgrades</span><span>Evidence levels A · B · C</span><span>Runs in your browser, no data sent</span><span>Not for clinical decisions</span>
+        <span>Evidence levels A · B · C</span><span>Runs in your browser, no data sent</span><span>Not for clinical decisions</span>
       </div>
     </div>
     <div class="header-actions">
       <button class="btn-primary" onclick="runAnalysis()">▶ Run Analysis</button>
       <button class="btn-secondary" onclick="clearAll()">✕ Clear</button>
-      <button class="btn-secondary" onclick="exportReport()">⬇ Export Report</button>
+      <button class="btn-secondary" onclick="printReport()">⬇ Export PDF</button>
     </div>
   </div>
 </header>
@@ -336,9 +336,9 @@ tr:hover { background: rgba(56,189,248,0.05); }
       <label><input type="checkbox" class="redflag" value="movement"> Movement disorder / Tremor / Rigidity</label>
       <label><input type="checkbox" class="redflag" value="fluctuating"> Rapidly fluctuating course</label>
 
-      <h4>Autoimmune Encephalitis Red Flags (UPGRADE #7)</h4>
+      <h4>Autoimmune Encephalitis Red Flags</h4>
       <div class="banner banner-danger">
-        🧠 <strong>AE SCREENING: 25% initially misdiagnosed as psychiatric (Flanagan, 2023)</strong>
+        <strong>AE SCREENING: 25% initially misdiagnosed as psychiatric (Flanagan, 2023)</strong>
       </div>
       <label><input type="checkbox" class="aeFlag" value="fluctuating_consciousness"> Fluctuating consciousness + Treatment resistance</label>
       <label><input type="checkbox" class="aeFlag" value="orofacial"> Orofacial dyskinesias (subtle mouthing movements)</label>
@@ -357,7 +357,7 @@ tr:hover { background: rgba(56,189,248,0.05); }
 <!-- ==================== TAB 3: MEDICATION / EXPOSURE MAP ==================== -->
 <section id="tab-medications" class="panel">
   <div class="banner banner-info">
-    📋 <strong>TEMPORAL RULE:</strong> Map the 72 hours to 6 months before onset. Confirm timing, dose changes, missed doses, discontinuation, and collateral history. Acute reactions require tight timing; depletion syndromes may require months of exposure.
+   <strong>TEMPORAL RULE:</strong> Map the 72 hours to 6 months before onset. Confirm timing, dose changes, missed doses, discontinuation, and collateral history. Acute reactions require tight timing; depletion syndromes may require months of exposure.
   </div>
 
   <div class="grid">
@@ -395,7 +395,7 @@ tr:hover { background: rgba(56,189,248,0.05); }
   </div>
 
   <div class="card">
-    <h3>Marginal Deficiency + Pharmacologic Trigger Pattern (UPGRADE #6)</h3>
+    <h3>Marginal Deficiency + Pharmacologic Trigger Pattern</h3>
     <div class="banner banner-warn">
       ⚠️ <strong>PATTERN DETECTION:</strong> The most dangerous cascade involves patients with subclinical nutritional deficiencies who then receive medications that further deplete micronutrients or directly induce psychiatric symptoms. The medication acts as the final common pathway, unmasking a pre-existing vulnerability.
     </div>
@@ -404,7 +404,7 @@ tr:hover { background: rgba(56,189,248,0.05); }
     <label><input type="checkbox" id="lowFerritin"> Ferritin &lt;30 ng/mL documented (subclinical deficiency)</label>
     <label><input type="checkbox" id="normalB12"> Serum B12 indeterminate (180–350 ng/L) and MMA not tested</label>
     <div id="marginalAlert" style="display:none" class="banner banner-danger">
-      🚨 <strong>MARGINAL DEFICIENCY + PHARMACOLOGIC TRIGGER PATTERN DETECTED</strong><br>
+     <strong>MARGINAL DEFICIENCY + PHARMACOLOGIC TRIGGER PATTERN DETECTED</strong><br>
       Subclinical nutritional deficiencies from chronic PPI use, unmasked as acute psychiatric symptoms by corticosteroid.<br>
       Without temporal medication mapping, the true cause remains invisible and PPL leads to progressive DUSI.<br>
       <strong>Action:</strong> Check MMA/Homocysteine and Ferritin BEFORE psychiatric coding.
@@ -428,7 +428,7 @@ tr:hover { background: rgba(56,189,248,0.05); }
 <!-- ==================== TAB 4: FESS LABS ==================== -->
 <section id="tab-labs" class="panel">
   <div class="banner banner-info">
-    🔬 <strong>ROUTINE TESTS HAVE LIMITS:</strong> A normal routine panel does not rule out a somatic cause.
+   <strong>ROUTINE TESTS HAVE LIMITS:</strong> A normal routine panel does not rule out a somatic cause.
   </div>
 
   <div class="grid">
@@ -445,13 +445,44 @@ tr:hover { background: rgba(56,189,248,0.05); }
         <tr><td>25-OH Vitamin D</td><td><select class="lab" data-test="vitd"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>OR 4.96 for moderate-severe depression if deficient</td><td>B: plausible contributor</td></tr>
         <tr><td>Serum Copper + 24h Urine Cu</td><td><select class="lab" data-test="copper"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Ceruloplasmin unreliable (acute phase reactant)</td><td>B: plausible contributor</td></tr>
         <tr><td>TSH / Free T4 / Free T3 / TPOAb</td><td><select class="lab" data-test="thyroid"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Euthyroid labs miss antibody-positive disease</td><td>A: established mimic</td></tr>
-        <tr><td>Morning Cortisol</td><td><select class="lab" data-test="cortisol"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Cushing's/Addison's missed without targeted testing</td><td>Not graded in Table 5</td></tr>
-        <tr><td>CBC</td><td><select class="lab" data-test="cbc"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>n/a</td><td>Not graded in Table 5</td></tr>
-        <tr><td>Metabolic Panel</td><td><select class="lab" data-test="metabolic"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>n/a</td><td>Not graded in Table 5</td></tr>
-        <tr><td>ESR / CRP</td><td><select class="lab" data-test="inflammatory"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Autoimmune/inflammatory mimics</td><td>Not graded in Table 5</td></tr>
-        <tr><td>HIV / Syphilis Serology</td><td><select class="lab" data-test="infection"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>Neurosyphilis, HIV presenting as psychiatric</td><td>A: established mimic</td></tr>
-        <tr><td>Urine Drug Screen / Toxicology</td><td><select class="lab" data-test="tox"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td><td>n/a</td><td>A: established mimic</td></tr>
-      </table>
+       <tr>
+        <tr>
+        <td>24-hour urinary free cortisol / late-night salivary cortisol</td>
+        <td><select><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td>
+        <td>Weight stigma; fluctuating symptoms (Cushing's only)</td>
+        <td>Not graded (Tier 2: Triggered by Red Flags)</td>
+        </tr>
+        <tr>
+        <td>CBC (Full Blood Count)</td>
+        <td><select class="lab" data-test="cbc"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td>
+        <td>n/a</td>
+        <td>Not graded (Tier 1 baseline)</td>
+        </tr>
+        <tr>
+        <td>Basic Metabolic Panel</td>
+        <td><select class="lab" data-test="metabolic"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td>
+        <td>n/a</td>
+        <td>Not graded (Tier 1 baseline)</td>
+        </tr>
+        <tr>
+        <td>ESR / CRP</td>
+        <td><select class="lab" data-test="inflammatory"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td>
+        <td>Autoimmune/inflammatory mimics</td>
+        <td>Not graded (Tier 1 extension)</td>
+        </tr>
+        <tr>
+        <td>HIV / Syphilis Serology</td>
+        <td><select class="lab" data-test="infection"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td>
+        <td>Neurosyphilis, HIV presenting as psychiatric</td>
+        <td>A: established mimic (Tier 1 extension)</td>
+        </tr>
+        <tr>
+        <td>Urine Drug Screen / Toxicology</td>
+        <td><select class="lab" data-test="tox"><option>Not done</option><option>Pending</option><option>Normal</option><option>Abnormal</option></select></td>
+        <td>n/a</td>
+        <td>A: established mimic (Tier 1 baseline)</td>
+        </tr>
+        </table>
     </div>
 
     <div class="card">
@@ -481,7 +512,7 @@ tr:hover { background: rgba(56,189,248,0.05); }
 
       <h4>The "Low-Normal" Trap</h4>
       <div class="banner banner-danger">
-        🚨 Serum B12 in the indeterminate range is not reassuring. MMA is the second-line test, judged against the local laboratory range.<br>
+        Serum B12 in the indeterminate range is not reassuring. MMA is the second-line test, judged against the local laboratory range.<br>
                 Check MMA and homocysteine, not serum B12 alone.
       </div>
     </div>
@@ -492,7 +523,7 @@ tr:hover { background: rgba(56,189,248,0.05); }
 <section id="tab-pause" class="panel">
 
   <div class="banner banner-danger" style="font-size:1rem;">
-    🛑 <strong>CLINICAL URGENCY CLARIFICATION (UPGRADE #2)</strong><br><br>
+    🛑 <strong>CLINICAL URGENCY CLARIFICATION</strong><br><br>
     This pause is a <strong>DOCUMENTATION REQUIREMENT</strong>, NOT a treatment delay.<br><br>
     Chemical sedation, physical restraint, involuntary hold, and emergency psychiatric admission may proceed <strong>IMMEDIATELY</strong> when clinically indicated.<br><br>
     The pause requires that the workup was <strong>ORDERED</strong> and that the psychiatric diagnosis is recorded as <strong>PROVISIONAL</strong> pending results.<br><br>
@@ -529,7 +560,7 @@ tr:hover { background: rgba(56,189,248,0.05); }
     </div>
 
     <div class="card">
-      <h3>Comorbidity Decision Algorithm (UPGRADE #1)</h3>
+      <h3>Comorbidity Decision Algorithm</h3>
       <div class="banner banner-info">
         ℹ️ The most common real-world scenario is <strong>genuine psychiatric–somatic comorbidity</strong>: a patient who has BOTH major depression AND hypothyroidism, BOTH schizophrenia AND B12 deficiency.
       </div>
@@ -577,7 +608,7 @@ tr:hover { background: rgba(56,189,248,0.05); }
     <div class="rs-actions">
       <button class="btn-secondary" onclick="showTab('patient')">← Back to inputs</button>
       <button class="btn-secondary" onclick="printReport()">Print or save as PDF</button>
-      <button class="btn-secondary" onclick="exportReport()">⬇ Export text</button>
+      <button class="btn-secondary" onclick="printReport()">⬇ Export PDF</button>
     </div>
     <nav class="rs-jump">
       <a href="#sec-risk">Risk</a><a href="#sec-context">Context</a><a href="#sec-pause">Pause</a><a href="#sec-pathways">Pathways</a><a href="#sec-alerts">Alerts</a><a href="#sec-actions">Actions</a><a href="#sec-meds">Medications</a><a href="#sec-nutrients">Nutrients</a><a href="#sec-diff">Differential</a><a href="#sec-gaps">Workup gaps</a>
@@ -585,31 +616,27 @@ tr:hover { background: rgba(56,189,248,0.05); }
   </div>
   <div id="reportBody"><p class="muted">Run the analysis to see the full report here.</p></div>
 </section>
-
 </main>
 
 <div id="aboutPanel" class="about-panel" style="display:none">
-    <div class="about-section" style="padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 0.9em; color: #495057;">
-        <h3>About this engine</h3>
-        <p>The <strong>PPL–DUSI Diagnostic Engine v4.11</strong> is an educational, browser-based clinical decision-support prototype built on the PPL–DUSI framework: Premature Psychiatric Labelling and Duration of Untreated Somatic Illness. It operationalizes the First-Episode Somatic Screen (FESS), Temporal Medication Mapping, and the EHR-Enforced Diagnostic Pause.</p>
-        <p><strong>Based on:</strong><br>
-        Noire, E. (2026). <em>Premature Psychiatric Labelling and Duration of Untreated Somatic Illness: A Theoretical Framework and Clinical Safeguard Protocol</em>. Preprint. DOI: <a href="[INSERT PREPRINTS.ORG DOI HERE]" target="_blank">[INSERT PREPRINTS.ORG DOI HERE]</a></p>
-        <p><strong>Engine Archive:</strong><br>
-        Zenodo DOI: <a href="[INSERT ZENODO DOI HERE]" target="_blank">[INSERT ZENODO DOI HERE]</a></p>
-        <p><strong>Defensive Publication Notice:</strong><br>
-        The theoretical framework of Premature Psychiatric Labelling (PPL), Duration of Untreated Somatic Illness (DUSI), and the associated First-Episode Somatic Screen (FESS) protocol are published as defensive prior art to prevent third-party patenting, while retaining copyright and academic attribution.</p>
-        <p><strong>Licence and Contact:</strong><br>
-        © 2026 Eeta Noire. Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a>.<br>
-        ORCID: <a href="https://orcid.org/0009-0000-6566-2214" target="_blank">0009-0000-6566-2214</a><br>
-        Email: <a href="mailto:eeta@eetanoire.com">eeta@eetanoire.com</a><br>
-        Web: <a href="https://psychopoetics.io" target="_blank">psychopoetics.io</a></p>
-        <p style="color: #dc3545; font-weight: bold; margin-top: 15px;">
-            ⚠️ Clinical Disclaimer: Educational decision-support prototype only. Not a diagnosis, emergency triage system, or substitute for professional judgment, examination, laboratory confirmation, specialist consultation, or local protocols. Runs locally in your browser; no data is transmitted.
-        </p>
-    </div>
+  <div class="about-grid">
+       <div><h4>About this engine</h4>
+      <p>The <strong>PPL–DUSI Diagnostic Engine V5.2</strong> is an educational decision-support prototype built on the PPL–DUSI framework: premature psychiatric labelling and duration of untreated somatic illness.</p></div>
+    <div><h4>Based on</h4>
+      <p>Noire E. Premature Psychiatric Labelling and Duration of Untreated Somatic Illness: A Theoretical Framework and Clinical Safeguard Protocol. Preprint, 2026. DOI: <a href="[INSERT PREPRINTS.ORG DOI HERE]" target="_blank">[INSERT PREPRINTS.ORG DOI HERE]</a></p>
+      <p class="about-small">Engine Archive DOI: <a href="[INSERT ZENODO DOI HERE]" target="_blank">[INSERT ZENODO DOI HERE]</a></p></div>
+    <div><h4>Defensive Publication Notice</h4>
+      <p class="about-small">The theoretical framework of Premature Psychiatric Labelling (PPL), Duration of Untreated Somatic Illness (DUSI), and the associated First-Episode Somatic Screen (FESS) protocol are published as defensive prior art to prevent third-party patenting, while retaining copyright and academic attribution.</p></div>
+    <div><h4>Licence and contact</h4>
+      <p>© 2026 Eeta Noire. Licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a>.</p>
+      <p class="about-small">ORCID: <a href="https://orcid.org/0009-0000-6566-2214" target="_blank">0009-0000-6566-2214</a><br>
+      Email: <a href="mailto:eeta@eetanoire.com">eeta@eetanoire.com</a><br>
+      Web: <a href="https://psychopoetics.io" target="_blank">psychopoetics.io</a></p></div>
   </div>
+  <p class="about-small" style="color: #dc3545; font-weight: bold; margin-top: 15px;">⚠️ Clinical disclaimer: educational decision-support prototype only. Not a diagnosis, emergency triage system, or substitute for professional judgment, examination, laboratory confirmation, specialist consultation, or local protocols. Runs in browser; no data is transmitted.</p>
+</div>
 <footer class="ftr-min">
-  <span>PPL–DUSI v4.11 · © 2026 Eeta Noire · CC BY-NC 4.0 · Not for clinical decisions</span>
+  <span>PPL–DUSI V5.2 · © 2026 Eeta Noire · CC BY-NC 4.0 · Not for clinical decisions</span>
   <button class="about-toggle" id="aboutBtn" aria-expanded="false" aria-controls="aboutPanel" onclick="toggleAbout()">About</button>
 </footer>
 
@@ -806,12 +833,11 @@ const rs = document.getElementById('runStatus'); if (rs) rs.textContent = 'Analy
 
   // Quality metrics (simulated for single-patient view)
 
-  // Generate structured report (UPGRADE #12)
   const report = [
     '═══════════════════════════════════════════════════',
     ' PPL-DUSI CLINICAL SAFEGUARD REPORT',
     ' Generated: ' + new Date().toISOString(),
-    ' Engine: PPL-DUSI Diagnostic Engine v4.11',
+    ' Engine: PPL-DUSI Diagnostic Engine v4.12',
     '═══════════════════════════════════════════════════',
     '',
     'PATIENT CONTEXT',
@@ -906,17 +932,6 @@ function renderList(id, items, empty) {
 }
 
 // ==================== EXPORT ====================
-function exportReport() {
-  if (!window._lastReport) { runAnalysis(); }
-  const blob = new Blob([window._lastReport], { type: 'text/plain;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'PPL-DUSI-Clinical-Safeguard-Report-' + new Date().toISOString().slice(0,10) + '.txt';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(a.href);
-}
 
 // ==================== CLEAR ====================
 function clearAll() {
@@ -966,8 +981,11 @@ function toggleAbout() {
 }
 
 function printReport() {
+  const titleBefore = document.title;
+  document.title = 'PPL-DUSI analysis ' + new Date().toISOString().slice(0, 10);
   document.body.classList.add('print-report');
   window.addEventListener('afterprint', function done() {
+    document.title = titleBefore;
     document.body.classList.remove('print-report');
     window.removeEventListener('afterprint', done);
   });
@@ -980,6 +998,17 @@ function syncHdr() {
 window.addEventListener('resize', syncHdr);
 window.addEventListener('scroll', syncHdr, { passive: true });
 syncHdr();
+// Add this to your existing <script> block
+document.getElementById('age').addEventListener('blur', function() {
+    const age = parseInt(this.value);
+    if (age && age < 18) {
+        alert("⚠️ WARNING: This framework is validated for adults (≥18) only. Adolescent presentations require different reference ranges, developmental differentials, and consent arrangements.");
+        // Optional: clear the input or highlight it in red
+        this.style.borderColor = "red"; 
+    } else {
+        this.style.borderColor = ""; // reset border color
+    }
+});
 </script>
 </body>
 </html>
