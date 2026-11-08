@@ -2,19 +2,19 @@ cff-version: 1.2.0
 message: "If you use this work, please cite it as below."
 type: software
 title: "PPL-DUSI Diagnostic Engine"
-version: "4.11"
-date-released: "2026-10-04"
+version: "5.2"
+date-released: "2026-10-29"
+doi: "10.5281/zenodo.23774614"
 authors:
   - family-names: Noire
     given-names: Eeta
     orcid: "https://orcid.org/0009-0000-6566-2214"
 preferred-citation:
   type: article
-  title: "[PAPER TITLE, to be confirmed]"
+  title: "Premature Psychiatric Labelling and Duration of Untreated Somatic Illness: A Theoretical Framework and Clinical Safeguard Protocol"
   authors:
     - family-names: Noire
       given-names: Eeta
   year: 2026
-  url: "[PREPRINT URL, to be added]"
 license: CC-BY-NC-4.0
 license-url: "LICENSE.md"

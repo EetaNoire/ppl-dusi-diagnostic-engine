@@ -23,7 +23,7 @@ This engine is the functional proof-of-concept accompanying the theoretical fram
 > Noire, E. (2026). *Premature Psychiatric Labelling and Duration of Untreated Somatic Illness: A Theoretical Framework and Clinical Safeguard Protocol*. Preprint. DOI: [INSERT PREPRINTS.ORG DOI HERE]
 
 The engine is permanently archived and citable via Zenodo:  
-**DOI:** [INSERT ZENODO DOI HERE]
+**DOI:** [10.5281/zenodo.23774614](https://doi.org/10.5281/zenodo.23774614)
 
 ## Defensive Publication Notice
 The theoretical framework of Premature Psychiatric Labelling (PPL), Duration of Untreated Somatic Illness (DUSI), and the associated First-Episode Somatic Screen (FESS) protocol are hereby published as defensive prior art. This publication is intended to place these diagnostic safety concepts and clinical workflows permanently in the public domain to prevent their patenting by third parties, while retaining copyright and academic attribution for the author.
